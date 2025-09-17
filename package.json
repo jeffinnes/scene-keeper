@@ -1,5 +1,5 @@
 {
-  "name": "SceneKeeper",
+  "name": "scene-keeper",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",

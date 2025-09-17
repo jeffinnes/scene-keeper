@@ -1,4 +1,4 @@
-# SceneKeeper
+# Scene Keeper
 
 A Discord bot that captures channel conversations and emails them to designated recipients.
 
