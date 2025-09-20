@@ -2,12 +2,13 @@
   "name": "scene-keeper",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx --env-file=.env watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node --env-file=.env dist/index.js"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.2",
+    "discord-interactions": "^4.3.0",
     "hono": "^4.9.7"
   },
   "devDependencies": {
