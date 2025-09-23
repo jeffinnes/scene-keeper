@@ -15,6 +15,7 @@ const interactions = new Hono().basePath('/interactions');
 interactions.post('/', verifyKeyMiddleware, async (ctx) => {
   // Handle the interaction here
   const { id, type, data } = await ctx.req.json();
+  console.log('Interaction received:', { id, type, data });
 
   if (type === InteractionType.PING) {
     ctx.status(200);
