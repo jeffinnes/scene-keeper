@@ -23,6 +23,9 @@ interactions.post('/', verifyKeyMiddleware, async (ctx) => {
   }
 });
 
+// Mount the interactions app to the main app
+app.route('/interactions', interactions);
+
 serve(
   {
     fetch: app.fetch,
