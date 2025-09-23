@@ -9,19 +9,18 @@ app.get('/', (ctx) => {
   return ctx.text('Hello Hono!');
 });
 
+app.get('/interactions', (ctx) => {
+  return ctx.text('This endpoint is for Discord interactions. Please use POST requests.');
+});
+
 app.post('/interactions', verifyKeyMiddleware, async (ctx) => {
   // Handle the interaction here
   const { id, type, data } = await ctx.req.json();
-  console.log('Interaction received:', { id, type, data });
 
   if (type === InteractionType.PING) {
     ctx.status(200);
     return ctx.json({ type: InteractionResponseType.PONG });
   }
-});
-
-app.get('/interactions', (ctx) => {
-  return ctx.text('This endpoint is for Discord interactions. Please use POST requests.');
 });
 
 serve(
