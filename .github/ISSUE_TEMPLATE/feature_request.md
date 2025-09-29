@@ -1,7 +1,10 @@
 ---
 name: Feature Request
-title: '[FEATURE] <short description>'
-labels: [enhancement, triage]
+about: Submit a new feature request or modification to an existing feature
+title: "[FEATURE] <short description>"
+labels: enhancement
+assignees: ''
+
 ---
 
 # Feature Request
@@ -10,7 +13,7 @@ Thanks for suggesting a feature! Please describe your idea below.
 
 ## Feature Type
 
-- [ ] New slash command
+- [ ] Slash command
 - [ ] Bot behavior/automation
 - [ ] Admin/moderation feature
 - [ ] User utility

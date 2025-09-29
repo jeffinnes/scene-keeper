@@ -1,7 +1,10 @@
 ---
 name: Bug Report
-title: '[BUG] <short description>'
-labels: [bug, triage]
+about: Report a bug
+title: "[BUG] <short description>"
+labels: bug
+assignees: ''
+
 ---
 
 # Bug Report
@@ -41,4 +44,6 @@ Thanks for reporting a bug! Please fill out the sections below.
 
 ## Discord Client
 
-<!-- Desktop, mobile, web, bot version if known (e.g., Desktop v1.0.9012) -->
+- [ ] Desktop
+- [ ] Mobile
+- [ ] Web
