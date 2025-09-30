@@ -4,7 +4,8 @@
  * (As of September 2025)
  */
 import type { ApplicationCommand } from '@/types/command.js';
-import { commandList } from '@/commands/development/commandList.js';
+import { devCommandList } from '@/commands/development/commandList.js';
+import { liveCommandList } from '@/commands/released/commandList.js';
 import packageJson from '../../package.json' with { type: 'json' };
 
 // Define reusable utility functions to register commands with Discord
@@ -84,11 +85,11 @@ async function InstallGlobalCommands(appId: string, commands: ApplicationCommand
       }
 
       console.log(`Registering commands for guild ID: ${guildId}`);
-      await InstallDevCommands(appId, guildId, commandList);
+      await InstallDevCommands(appId, guildId, devCommandList);
     }
 
     // Install global commands
-    await InstallGlobalCommands(appId, commandList);
+    await InstallGlobalCommands(appId, liveCommandList);
   } catch (error) {
     console.error(error);
   }

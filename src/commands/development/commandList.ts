@@ -7,7 +7,7 @@ import type { ApplicationCommand } from '@/types/command.js';
 const testCommand: ApplicationCommand = {
   version: '1',
   type: 1, // 1 is a slash command
-  name: 'test-1',
+  name: 'test',
   description: 'A test command to see if Jeff got the command registration process working.',
   application_id: process.env.APP_ID || 'missing_app_id',
   default_member_permissions: (
@@ -17,4 +17,4 @@ const testCommand: ApplicationCommand = {
   ).toString(), // Set the permissions a user must have to use it.
 };
 
-export const commandList: ApplicationCommand[] = [testCommand];
+export const devCommandList: ApplicationCommand[] = [testCommand];
