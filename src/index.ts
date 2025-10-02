@@ -21,6 +21,19 @@ app.post('/interactions', verifyKeyMiddleware, async (ctx) => {
     ctx.status(200);
     return ctx.json({ type: InteractionResponseType.PONG });
   }
+
+  if (type === InteractionType.APPLICATION_COMMAND) {
+    console.log(`req: ${JSON.stringify(await ctx.req.json(), null, 2)}`);
+
+    if (data.name === 'test') {
+      return ctx.json({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: 'Test command received! The command registration process is working.',
+        },
+      });
+    }
+  }
 });
 
 serve(
