@@ -23,7 +23,7 @@ const clean: ApplicationCommand = {
   name: 'clean',
   description: 'Clear all non-pinned messages from the channel.',
   application_id: process.env.APP_ID || 'missing_app_id',
-  default_member_permissions: (0x0000000000002000 | 0x0000000400000000).toString(), // Set the permissions a user must have to use it.
+  default_member_permissions: (0x800 | 0x2000 | 0x400000000).toString(), // Set the permissions a user must have to use it.
 };
 
 export const devCommandList: ApplicationCommand[] = [testCommand, clean];
