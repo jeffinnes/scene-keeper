@@ -17,4 +17,13 @@ const testCommand: ApplicationCommand = {
   ).toString(), // Set the permissions a user must have to use it.
 };
 
-export const devCommandList: ApplicationCommand[] = [testCommand];
+const clean: ApplicationCommand = {
+  version: '1',
+  type: 1, // 1 is a slash command
+  name: 'clean',
+  description: 'Clear all non-pinned messages from the channel.',
+  application_id: process.env.APP_ID || 'missing_app_id',
+  default_member_permissions: (0x800 | 0x2000 | 0x400000000).toString(), // Set the permissions a user must have to use it.
+};
+
+export const devCommandList: ApplicationCommand[] = [testCommand, clean];
