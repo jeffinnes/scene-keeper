@@ -3,7 +3,7 @@
  * after the specified retry_after duration. It will retry up to maxRetries times before
  * giving up and returning the 429 response.
  */
-export async function rateLimitedFetch(
+async function rateLimitedFetch(
   url: string,
   options?: RequestInit,
   maxRetries: number = 3
@@ -61,3 +61,5 @@ export async function rateLimitedFetch(
   // This should never be reached due to the logic above, but TypeScript needs it
   throw new Error('Unexpected error in rateLimitedFetch');
 }
+
+export { rateLimitedFetch };
