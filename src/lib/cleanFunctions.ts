@@ -15,14 +15,13 @@ async function cleanChannel(
     `Cleaning channel: ${channel.name} (ID: ${channel.id}) requested by user ${user.username}`
   );
 
-  const messageLimit = 2; // Discord API message limit per request
+  const messageLimit = 100; // Discord API message limit per request (100 max, set lower for debugging with low use channels)
 
   const messageIDs: string[] = [];
 
   let flag = true;
 
   while (flag === true) {
-    // Implementation for fetching and processing messages in batches
     // Fetch all the channel messages
     const getMessagesUrl = `${baseUrl}channels/${channel.id}/messages?limit=${messageLimit}${
       messageIDs.length > 0 ? `&before=${messageIDs[messageIDs.length - 1]}` : ''
