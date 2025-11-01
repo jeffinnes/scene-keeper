@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import { InteractionType, InteractionResponseType } from 'discord-interactions';
 import { verifyKeyMiddleware } from './middleware/verifyKey.js';
 import { cleanChannel } from './lib/cleanFunctions.js';
-import { archiveChannel } from './lib/archiveFunctions.js';
+import { transcribeChannel } from './lib/transcribeFunctions.js';
 
 const app = new Hono();
 
@@ -52,7 +52,7 @@ app.post('/interactions', verifyKeyMiddleware, async (ctx) => {
       });
     }
 
-    if (data.name === 'archive') {
+    if (data.name === 'transcribe') {
       // console.log(`req: ${JSON.stringify(await ctx.req.json(), null, 2)}`);
       const emailListObject: { name: string; type: number; value: string } | undefined =
         data.options.find(
@@ -66,7 +66,7 @@ app.post('/interactions', verifyKeyMiddleware, async (ctx) => {
         return ctx.json({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
-            content: `Archive command received from user ${member.user.username}! But no email recipients were provided.`,
+            content: `Transcribe command received from user ${member.user.username}! But no email recipients were provided.`,
           },
         });
       }
@@ -74,8 +74,8 @@ app.post('/interactions', verifyKeyMiddleware, async (ctx) => {
       // Split the comma-separated email list into an array and trim whitespace
       const emailRecipients = emailListObject.value.split(',').map((email: string) => email.trim());
 
-      // Call the archiveChannel function to process the channel archiving in the background
-      archiveChannel(
+      // Call the transcribeChannel function to process the channel archiving in the background
+      transcribeChannel(
         guild_id,
         { id: channel.id, name: channel.name },
         { id: member.user.id, username: member.user.username },
@@ -86,7 +86,7 @@ app.post('/interactions', verifyKeyMiddleware, async (ctx) => {
       return ctx.json({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-          content: `Archive command received from user ${member.user.username}! Preparing to email message log.`,
+          content: `Transcribe command received from user ${member.user.username}! Preparing to email message log.`,
         },
       });
     }

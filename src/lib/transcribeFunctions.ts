@@ -7,7 +7,7 @@ import { rateLimitedFetch } from './sharedFunctions.js';
 const baseUrl = 'https://discord.com/api/v10/';
 const discordBotUserAgent = `DiscordBot (https://github.com/jeffinnes/scene-keeper, ${packageJson.version})`;
 
-async function archiveChannel(
+async function transcribeChannel(
   guildID: string,
   channel: { id: string; name: string },
   user: { id: string; username: string },
@@ -16,7 +16,7 @@ async function archiveChannel(
   try {
     // ToDo Delete debug logging when done
     console.log(
-      `Sending channel archive for: ${channel.name} (ID: ${channel.id}) requested by user ${user.username}`
+      `Sending channel transcription for: ${channel.name} (ID: ${channel.id}) requested by user ${user.username}`
     );
 
     // Fetch guild name for email context
@@ -38,15 +38,15 @@ async function archiveChannel(
 
     const messageLimit = 100; // Discord API message limit per request (100 max, set lower for debugging with low use channels)
 
-    const messagesToArchive: Message[] = [];
+    const messagesToTranscribe: Message[] = [];
 
     let flag = true;
 
     while (flag === true) {
       // Fetch all the channel messages
       const getMessagesUrl = `${baseUrl}channels/${channel.id}/messages?limit=${messageLimit}${
-        messagesToArchive.length > 0
-          ? `&before=${messagesToArchive[messagesToArchive.length - 1].id}`
+        messagesToTranscribe.length > 0
+          ? `&before=${messagesToTranscribe[messagesToTranscribe.length - 1].id}`
           : ''
       }`;
 
@@ -71,7 +71,7 @@ async function archiveChannel(
         flag = false;
       }
 
-      messagesToArchive.push(...messages);
+      messagesToTranscribe.push(...messages);
     } // End of while loop
 
     // Build a Map of unique channel participants and get their guild nicknames
@@ -80,8 +80,8 @@ async function archiveChannel(
       { id: string; username: string; nickname: string | null }
     >();
 
-    for (let index = 0; index < messagesToArchive.length; index++) {
-      const message = messagesToArchive[index];
+    for (let index = 0; index < messagesToTranscribe.length; index++) {
+      const message = messagesToTranscribe[index];
 
       if (!channelParticipantsMap.has(message.author.id)) {
         channelParticipantsMap.set(message.author.id, {
@@ -135,11 +135,11 @@ async function archiveChannel(
     const channelParticipantsArray = Array.from(channelParticipantsMap.values());
 
     // Prepare the email content
-    messagesToArchive.sort(
+    messagesToTranscribe.sort(
       (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
     );
 
-    const emailTextContent = `Archive of Discord messages from channel ${channel.name} in server: ${guildInfo.name}
+    const emailTextContent = `Transcription of Discord messages from channel ${channel.name} in server: ${guildInfo.name}
 
 Participants:
 ${channelParticipantsArray
@@ -150,7 +150,7 @@ ${channelParticipantsArray
   .join('\n')}
 
 Messages:
-${messagesToArchive
+${messagesToTranscribe
   .map(
     (msg) =>
       `[${new Date(msg.timestamp).toUTCString()}] ${msg.author.username} ${channelParticipantsMap.get(msg.author.id)?.nickname ? ` (${channelParticipantsMap.get(msg.author.id)?.nickname})` : ''}: ${msg.content || ''}`
@@ -166,7 +166,7 @@ https://discord.com/oauth2/authorize?client_id=1416498066441109584
     // Note: the .join('')} at the end of the map functions are needed to concatenate the array items into a single string.
     const emailHtmlContent = `<html>
   <body>
-    <h2>Archive of Discord messages from channel ${channel.name} in server: ${guildInfo.name}</h2>
+    <h2>Transcription of Discord messages from channel ${channel.name} in server: ${guildInfo.name}</h2>
     <h3>Participants:</h3>
     <ul style="border: 1px solid #000; padding: 10px; list-style-type: none;">
       ${channelParticipantsArray
@@ -180,7 +180,7 @@ https://discord.com/oauth2/authorize?client_id=1416498066441109584
     </ul>
     <h3>Messages:</h3>
     <div style="border: 1px solid #000; padding: 10px; font-family: monospace;">
-${messagesToArchive
+${messagesToTranscribe
   .map(
     (msg) =>
       `<div><p style="margin-bottom: 0px;">[${new Date(msg.timestamp).toUTCString()}] ${msg.author.username}${channelParticipantsMap.get(msg.author.id)?.nickname ? ` (${channelParticipantsMap.get(msg.author.id)?.nickname})` : ''}:</p> <p style="font-weight: bold; margin-top: 0px;">${msg.content || ''}</p></div>`
@@ -193,7 +193,6 @@ ${messagesToArchive
   </body>
 </html>`;
 
-    // Logic to email the archived messages goes here
     const resend = new Resend(process.env.RESEND_API_KEY || 'missing_api_key');
 
     const currentDate = new Date();
@@ -204,16 +203,16 @@ ${messagesToArchive
     const { data, error } = await resend.emails.send({
       from: 'Scene Keeper Bot <bot@scenekeeper.xyz>',
       to: emailRecipients,
-      subject: `Archive of Discord Channel: ${channel.name} - ${formattedDate}`,
+      subject: `Transcription of Discord Channel: ${channel.name} - ${formattedDate}`,
       text: emailTextContent,
       html: emailHtmlContent,
     });
 
     if (error) {
-      throw new Error(`Failed to send archive email: ${error.message}`);
+      throw new Error(`Failed to send transcription email: ${error.message}`);
     }
 
-    // Send message to discord channel confirming archive sent
+    // Send message to discord channel confirming transcription sent
     const confirmationResponse = await rateLimitedFetch(
       `${baseUrl}channels/${channel.id}/messages`,
       {
@@ -224,9 +223,9 @@ ${messagesToArchive
           'User-Agent': discordBotUserAgent,
         },
         body: JSON.stringify({
-          content: `Archive email sent to: ${emailRecipients.join(', ')}.
-Total messages archived: ${messagesToArchive.length}.
-Once you have confirmed receipt of the archive email, you may wish to use the \`/clean\` command to clear non-pinned messages from this channel.`,
+          content: `Transcription email sent to: ${emailRecipients.join(', ')}.
+Total messages transcribed: ${messagesToTranscribe.length}.
+Once you have confirmed receipt of the transcription email, you may wish to use the \`/clean\` command to clear non-pinned messages from this channel.`,
         }),
       }
     );
@@ -243,4 +242,4 @@ Once you have confirmed receipt of the archive email, you may wish to use the \`
   }
 }
 
-export { archiveChannel };
+export { transcribeChannel };
