@@ -12,7 +12,7 @@
   "dependencies": {
     "@hono/node-server": "^1.19.2",
     "discord-interactions": "^4.3.0",
-    "hono": "^4.9.7",
+    "hono": "^4.10.4",
     "resend": "^6.2.2"
   },
   "devDependencies": {
