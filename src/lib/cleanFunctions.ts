@@ -1,68 +1,10 @@
-import packageJson from '../../package.json' with { type: 'json' };
-
 import type { Message } from '@/types/message.js';
+
+import packageJson from '../../package.json' with { type: 'json' };
+import { rateLimitedFetch } from './sharedFunctions.js';
 
 const baseUrl = 'https://discord.com/api/v10/';
 const discordBotUserAgent = `DiscordBot (https://github.com/jeffinnes/scene-keeper, ${packageJson.version})`;
-
-async function rateLimitedFetch(
-  url: string,
-  options?: RequestInit,
-  maxRetries: number = 3
-): Promise<Response> {
-  let retryCount = 0;
-
-  while (retryCount <= maxRetries) {
-    const response = await fetch(url, options);
-
-    // If not rate limited, return the response
-    if (response.status !== 429) {
-      return response;
-    }
-
-    // If we've hit the max retries, return the 429 response
-    if (retryCount >= maxRetries) {
-      console.error(`Max retries (${maxRetries}) exceeded for ${url}`);
-      return response;
-    }
-
-    // Handle rate limiting
-    let retryAfter = 1; // Default to 1 second if not specified
-
-    try {
-      // Check for retry_after in response headers first (Discord standard)
-      const retryAfterHeader = response.headers.get('retry-after');
-      if (retryAfterHeader) {
-        retryAfter = parseInt(retryAfterHeader, 10);
-      } else {
-        // Check response body for retry_after value
-        const responseBody = await response.text();
-        try {
-          const bodyJson = JSON.parse(responseBody);
-          if (bodyJson.retry_after) {
-            retryAfter = bodyJson.retry_after;
-          }
-        } catch {
-          // If parsing fails, use default retry time
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to parse retry_after, using default delay:', error);
-    }
-
-    console.log(
-      `Rate limited (429). Retrying in ${retryAfter} seconds... (attempt ${retryCount + 1}/${maxRetries + 1})`
-    );
-
-    // Wait for the retry_after duration (convert to milliseconds)
-    await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000));
-
-    retryCount++;
-  }
-
-  // This should never be reached due to the logic above, but TypeScript needs it
-  throw new Error('Unexpected error in rateLimitedFetch');
-}
 
 async function cleanChannel(
   channel: { id: string; name: string },
@@ -73,14 +15,13 @@ async function cleanChannel(
     `Cleaning channel: ${channel.name} (ID: ${channel.id}) requested by user ${user.username}`
   );
 
-  const messageLimit = 2; // Discord API message limit per request
+  const messageLimit = 100; // Discord API message limit per request (100 max, set lower for debugging with low use channels)
 
   const messageIDs: string[] = [];
 
   let flag = true;
 
   while (flag === true) {
-    // Implementation for fetching and processing messages in batches
     // Fetch all the channel messages
     const getMessagesUrl = `${baseUrl}channels/${channel.id}/messages?limit=${messageLimit}${
       messageIDs.length > 0 ? `&before=${messageIDs[messageIDs.length - 1]}` : ''
@@ -123,6 +64,7 @@ async function cleanChannel(
   console.log(`Total non-pinned messages to delete: ${messageIDs.length}`);
   console.log('Message IDs:', messageIDs);
 
+  // For testing/Debugging, just log the message IDs instead of deleting them.
   /* await rateLimitedFetch(`${baseUrl}channels/${channel.id}/messages`, {
     method: 'POST',
     headers: {
