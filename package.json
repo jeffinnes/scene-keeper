@@ -7,7 +7,7 @@
     "dev": "tsx watch --env-file=.env src/index.ts",
     "build": "tsc",
     "start": "node dist/src/index.js",
-    "register-commands": "tsx --env-file=.env src/commands/registerCommands.ts",
+    "register-commands": "tsx --env-file=.env src/command-registration/registerCommands.ts",
     "test": "jest"
   },
   "dependencies": {
