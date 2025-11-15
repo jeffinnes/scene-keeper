@@ -1,9 +1,9 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { InteractionType, InteractionResponseType } from 'discord-interactions';
-import { verifyKeyMiddleware } from './middleware/verifyKey.js';
-import { cleanChannel } from './lib/cleanFunctions.js';
-import { transcribeChannel } from './lib/transcribeFunctions.js';
+import { verifyKeyMiddleware } from '@/middleware/verifyKey.js';
+import { cleanChannel } from '@/commands/clean/cleanFunctions.js';
+import { transcribeChannel } from '@/commands/transcribe/transcribeFunctions.js';
 
 const app = new Hono();
 
