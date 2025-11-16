@@ -40,7 +40,7 @@ app.post('/interactions', verifyKeyMiddleware, async (ctx) => {
       handleCleanCommand(
         ctx,
         { id: channel.id, name: channel.name },
-        { id: member.user.id, username: member.user.username }
+        { user: { id: member.user.id, username: member.user.username } }
       );
     }
 
