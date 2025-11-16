@@ -4,8 +4,8 @@
  * (As of September 2025)
  */
 import type { ApplicationCommand } from '@/types/command.js';
-import { devCommandList } from '@/commands/development/commandList.js';
-import { liveCommandList } from '@/commands/released/commandList.js';
+import { devCommandList } from '@/command-registration/development/commandList.js';
+import { liveCommandList } from '@/command-registration/released/commandList.js';
 import packageJson from '../../package.json' with { type: 'json' };
 
 // Define reusable utility functions to register commands with Discord

@@ -1,8 +1,8 @@
 import type { Message } from '@/types/message.js';
 
-import packageJson from '../../package.json' with { type: 'json' };
+import packageJson from '../../../package.json' with { type: 'json' };
 import { Resend } from 'resend';
-import { rateLimitedFetch } from './sharedFunctions.js';
+import { rateLimitedFetch } from '@/lib/sharedFunctions.js';
 
 const baseUrl = 'https://discord.com/api/v10/';
 const discordBotUserAgent = `DiscordBot (https://github.com/jeffinnes/scene-keeper, ${packageJson.version})`;

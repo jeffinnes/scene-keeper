@@ -1,9 +1,9 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { InteractionType, InteractionResponseType } from 'discord-interactions';
-import { verifyKeyMiddleware } from './middleware/verifyKey.js';
-import { cleanChannel } from './lib/cleanFunctions.js';
-import { transcribeChannel } from './lib/transcribeFunctions.js';
+import { verifyKeyMiddleware } from '@/middleware/verifyKey.js';
+import { handleCleanCommand } from '@/commands/clean/clean.js';
+import { handletranscribeChannel } from '@/commands/transcribe/transcribe.js';
 
 const app = new Hono();
 
@@ -37,58 +37,21 @@ app.post('/interactions', verifyKeyMiddleware, async (ctx) => {
     }
 
     if (data.name === 'clean') {
-      // Call the cleanChannel function to process the channel cleanup in the background
-      cleanChannel(
+      handleCleanCommand(
+        ctx,
         { id: channel.id, name: channel.name },
-        { id: member.user.id, username: member.user.username }
+        { user: { id: member.user.id, username: member.user.username } }
       );
-
-      // Acknowledge the command and inform the user that the bot is processing it.
-      return ctx.json({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          content: `Clean command received from user ${member.user.username}! Preparing to clear non-pinned messages.`,
-        },
-      });
     }
 
     if (data.name === 'transcribe') {
-      // console.log(`req: ${JSON.stringify(await ctx.req.json(), null, 2)}`);
-      const emailListObject: { name: string; type: number; value: string } | undefined =
-        data.options.find(
-          (option: { name: string; type: number; value: string }) => option.name === 'email_list'
-        );
-
-      // If no email list provided, respond with an error message
-      // Discord should have prevented this from happening since it's a required option
-      // but just in case...
-      if (!emailListObject) {
-        return ctx.json({
-          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-          data: {
-            content: `Transcribe command received from user ${member.user.username}! But no email recipients were provided.`,
-          },
-        });
-      }
-
-      // Split the comma-separated email list into an array and trim whitespace
-      const emailRecipients = emailListObject.value.split(',').map((email: string) => email.trim());
-
-      // Call the transcribeChannel function to process the channel archiving in the background
-      transcribeChannel(
+      handletranscribeChannel(
+        ctx,
         guild_id,
         { id: channel.id, name: channel.name },
-        { id: member.user.id, username: member.user.username },
-        emailRecipients
+        { user: { id: member.user.id, username: member.user.username } },
+        data
       );
-
-      // Acknowledge the command and inform the user that the bot is processing it.
-      return ctx.json({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          content: `Transcribe command received from user ${member.user.username}! Preparing to email message log.`,
-        },
-      });
     }
   }
 });
