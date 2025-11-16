@@ -2,7 +2,7 @@ import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { InteractionType, InteractionResponseType } from 'discord-interactions';
 import { verifyKeyMiddleware } from '@/middleware/verifyKey.js';
-import { cleanChannel } from '@/commands/clean/cleanFunctions.js';
+import { handleCleanCommand } from '@/commands/clean/clean.js';
 import { transcribeChannel } from '@/commands/transcribe/transcribeFunctions.js';
 
 const app = new Hono();
@@ -37,19 +37,11 @@ app.post('/interactions', verifyKeyMiddleware, async (ctx) => {
     }
 
     if (data.name === 'clean') {
-      // Call the cleanChannel function to process the channel cleanup in the background
-      cleanChannel(
+      handleCleanCommand(
+        ctx,
         { id: channel.id, name: channel.name },
         { id: member.user.id, username: member.user.username }
       );
-
-      // Acknowledge the command and inform the user that the bot is processing it.
-      return ctx.json({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          content: `Clean command received from user ${member.user.username}! Preparing to clear non-pinned messages.`,
-        },
-      });
     }
 
     if (data.name === 'transcribe') {

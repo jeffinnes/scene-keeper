@@ -1,7 +1,7 @@
 import type { Message } from '@/types/message.js';
 
-import packageJson from '../../package.json' with { type: 'json' };
-import { rateLimitedFetch } from './sharedFunctions.js';
+import packageJson from '../../../package.json' with { type: 'json' };
+import { rateLimitedFetch } from '@/lib/sharedFunctions.js';
 
 const baseUrl = 'https://discord.com/api/v10/';
 const discordBotUserAgent = `DiscordBot (https://github.com/jeffinnes/scene-keeper, ${packageJson.version})`;
@@ -76,6 +76,7 @@ async function cleanChannel(
       content: `This would have deleted ${messageIDs.length} non-pinned messages...`,
     }),
   }); */
+
   for (const messageId of messageIDs) {
     await rateLimitedFetch(`${baseUrl}/channels/${channel.id}/messages/${messageId}`, {
       method: 'DELETE',
@@ -86,7 +87,6 @@ async function cleanChannel(
         'X-Audit-Log-Reason': `Clean command by user ${user.username} (ID: ${user.id})`,
       },
     });
-    console.log(`Deleted message ID: ${messageId}`);
   }
 }
 
